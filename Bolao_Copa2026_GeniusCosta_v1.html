@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bolão Copa 2026 — Apuração | Genius Costa</title>
+<style>
+:root{
+  --bg:#0a1018; --panel:#101a26; --panel2:#15212f; --line:#22384e;
+  --txt:#dbe7f3; --dim:#7e93a8; --gold:#f5c518; --green:#27c46a;
+  --red:#ef5350; --blue:#4aa3ff; --mono:"Consolas","SF Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);font:14px/1.45 "Segoe UI",system-ui,sans-serif;padding-bottom:60px}
+header{position:sticky;top:0;z-index:50;background:linear-gradient(180deg,#0d1622,#0a1018 90%);border-bottom:2px solid var(--gold);padding:10px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+header h1{font-size:17px;letter-spacing:.5px;text-transform:uppercase}
+header h1 b{color:var(--gold)}
+.score-chip{margin-left:auto;background:var(--panel2);border:1px solid var(--gold);border-radius:8px;padding:4px 14px;font-family:var(--mono);font-size:18px;color:var(--gold);font-weight:700}
+.score-chip small{color:var(--dim);font-size:11px;font-weight:400;display:block;line-height:1;margin-bottom:2px;font-family:inherit}
+.hbtn{background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:6px;padding:5px 10px;cursor:pointer;font-size:12px}
+.hbtn:hover{border-color:var(--blue)}
+.hbtn.gold{border-color:var(--gold);color:var(--gold);font-weight:700}
+#fetchlog{font-family:var(--mono);font-size:11.5px;color:#9fb4c8;background:#0c1520;border:1px solid var(--line);border-radius:8px;padding:8px 10px;max-height:200px;overflow:auto;white-space:pre-wrap;margin:10px 0;display:none}
+nav{display:flex;gap:4px;padding:8px 16px;border-bottom:1px solid var(--line);background:var(--panel);position:sticky;top:54px;z-index:49;flex-wrap:wrap}
+nav button{background:transparent;border:1px solid transparent;color:var(--dim);padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600}
+nav button.on{background:var(--panel2);color:var(--gold);border-color:var(--line)}
+main{max-width:1280px;margin:0 auto;padding:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.card h3{background:var(--panel2);padding:7px 12px;font-size:13px;letter-spacing:.5px;color:var(--gold);border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.card h3 .sub{color:var(--dim);font-weight:400;font-size:11px}
+.card .body{padding:8px 10px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+td,th{padding:4px 6px;border-bottom:1px solid #1a2a3c;vertical-align:middle}
+th{color:var(--dim);font-size:11px;text-transform:uppercase;text-align:left;letter-spacing:.4px}
+.r{text-align:right}.c{text-align:center}
+input[type=number]{width:42px;background:#0c1520;border:1px solid var(--line);color:var(--txt);border-radius:5px;padding:4px 2px;text-align:center;font-family:var(--mono);font-size:14px}
+input[type=number]:focus,input[type=text]:focus,select:focus{outline:none;border-color:var(--blue)}
+input[type=text]{background:#0c1520;border:1px solid var(--line);color:var(--txt);border-radius:5px;padding:4px 6px;font-size:13px;width:100%}
+select{background:#0c1520;border:1px solid var(--line);color:var(--txt);border-radius:5px;padding:4px;font-size:12px}
+.team{white-space:nowrap}
+.pred{color:var(--dim);font-family:var(--mono);font-size:12px}
+.pts{font-family:var(--mono);font-weight:700;text-align:right;width:36px}
+.p10{color:var(--gold)} .p8,.p7{color:var(--green)} .p5{color:var(--blue)} .p0{color:#46586c}
+.badge{display:inline-block;font-size:10px;border-radius:4px;padding:1px 6px;background:#1a2a3c;color:var(--dim);margin-left:6px}
+.warn{color:var(--gold)}
+.standing{font-family:var(--mono);font-size:12px}
+.standing .pos{color:var(--gold);width:24px;display:inline-block}
+.hit{color:var(--green);font-weight:700}.miss{color:#46586c}
+.section-title{margin:22px 0 10px;font-size:15px;color:var(--gold);text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--line);padding-bottom:6px;display:flex;justify-content:space-between;align-items:baseline}
+.section-title small{color:var(--dim);text-transform:none;letter-spacing:0;font-size:12px}
+.totbar{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:18px}
+.tot{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.tot .lbl{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px}
+.tot .val{font-family:var(--mono);font-size:26px;font-weight:700;color:var(--txt)}
+.tot.grand{border-color:var(--gold)} .tot.grand .val{color:var(--gold)}
+.note{background:#13202e;border-left:3px solid var(--blue);padding:8px 12px;border-radius:0 6px 6px 0;font-size:12.5px;color:#b6c8da;margin:10px 0}
+.note.y{border-left-color:var(--gold)}
+.ko-match{display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid #1a2a3c;flex-wrap:wrap}
+.ko-match .slot{font-family:var(--mono);font-size:11px;color:var(--dim);width:34px}
+.ko-match input[type=text]{width:130px}
+.ko-pred{font-size:11.5px;color:var(--dim);width:100%;padding-left:40px;font-family:var(--mono)}
+.ko-pred b{color:#9fb4c8;font-weight:600}
+.flag{cursor:help}
+footer{margin-top:30px;text-align:center;color:var(--dim);font-size:11px}
+@media(max-width:520px){.grid{grid-template-columns:1fr}.ko-match input[type=text]{width:104px}}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>⚽ Bolão <b>Copa 2026</b> — Genius Costa</h1>
+  <button class="hbtn gold" id="btnFetch" onclick="fetchESPN()">⟳ Atualizar resultados (ESPN)</button>
+  <button class="hbtn" onclick="exportJSON()">⬇ Exportar</button>
+  <button class="hbtn" onclick="document.getElementById('impfile').click()">⬆ Importar</button>
+  <input type="file" id="impfile" accept=".json" style="display:none" onchange="importJSON(this)">
+  <button class="hbtn" onclick="resetAll()">↺ Zerar resultados</button>
+  <div class="score-chip"><small>PONTUAÇÃO TOTAL</small><span id="totalChip">0</span></div>
+</header>
+
+<nav id="nav">
+  <button data-tab="res" class="on">1 · Resultados (grupos)</button>
+  <button data-tab="ko">2 · Mata-mata</button>
+  <button data-tab="score">3 · Pontuação</button>
+  <button data-tab="pred">4 · Meus palpites</button>
+  <button data-tab="rules">5 · Regras</button>
+</nav>
+
+<main>
+  <div id="tab-res"></div>
+  <div id="tab-ko" style="display:none"></div>
+  <div id="tab-score" style="display:none"></div>
+  <div id="tab-pred" style="display:none"></div>
+  <div id="tab-rules" style="display:none"></div>
+</main>
+
+<datalist id="teams"></datalist>
+<footer>Bolão Copa do Mundo FIFA 2026 · Sistema de apuração v1.0 · Echo Genius®</footer>
+
+<script>
+"use strict";
+/* ============================================================
+   CONFIG — pontuação conforme regulamento. Ajustável.
+   ============================================================ */
+const CONFIG = {
+  pts: {
+    cheio: 10,          // placar em cheio
+    vencEscVenc: 8,     // vencedor + escore do vencedor
+    vencEscPerd: 7,     // vencedor + escore do perdedor
+    venc: 5,            // apenas o vencedor
+    empate: 8,          // apenas o empate (placar errado)
+    col1: 20, col2: 15, col3: 10,   // colocados por grupo (2ª fase)
+    slot: 20,           // classificado na posição correta (oitavas em diante)
+    campeao: 50, vice: 30, terceiro: 20, artilheiro: 30
+  },
+  // Interpretações configuráveis (confirmar com o conferente):
+  slotOrdemIndiferente: true,  // time certo no confronto certo vale 20, independente do lado da chave
+  placarSemConfrontoExato: true // confrontos distintos: compara só o placar (10/8/7 por linha de placar)
+};
+
+/* ============================================================
+   PALPITES — transcritos da ficha escaneada (CamScanner 03/06).
+   Campos marcados com w:1 = leitura incerta do manuscrito → revisar na aba 4.
+   ============================================================ */
+const GRUPOS = {
+  A:["México","África do Sul","Coreia do Sul","Tchéquia"],
+  B:["Canadá","Bósnia","Catar","Suíça"],
+  C:["Brasil","Marrocos","Haiti","Escócia"],
+  D:["EUA","Paraguai","Austrália","Turquia"],
+  E:["Alemanha","Curaçao","C. do Marfim","Equador"],
+  F:["Holanda","Japão","Suécia","Tunísia"],
+  G:["Bélgica","Egito","Irã","Nova Zelândia"],
+  H:["Espanha","Cabo Verde","Arábia Saudita","Uruguai"],
+  I:["França","Senegal","Iraque","Noruega"],
+  J:["Argentina","Argélia","Áustria","Jordânia"],
+  K:["Portugal","RD Congo","Uzbequistão","Colômbia"],
+  L:["Inglaterra","Gana","Croácia","Panamá"]
+};
+
+// [data, mandante, visitante, palpite_m, palpite_v]
+const JOGOS_DEFAULT = {
+  A:[["11/06","México","África do Sul",2,0],["11/06","Coreia do Sul","Tchéquia",1,1],
+     ["18/06","Tchéquia","África do Sul",2,1],["18/06","México","Coreia do Sul",2,1],
+     ["24/06","Tchéquia","México",1,2],["24/06","África do Sul","Coreia do Sul",0,2]],
+  B:[["13/06","Canadá","Bósnia",2,1],["13/06","Catar","Suíça",0,2],
+     ["18/06","Suíça","Bósnia",2,1],["18/06","Canadá","Catar",2,0],
+     ["24/06","Suíça","Canadá",1,1],["24/06","Bósnia","Catar",1,0]],
+  C:[["13/06","Brasil","Marrocos",3,0],["13/06","Haiti","Escócia",0,2],
+     ["19/06","Escócia","Marrocos",1,2],["19/06","Brasil","Haiti",4,0],
+     ["24/06","Escócia","Brasil",0,3],["24/06","Marrocos","Haiti",2,0]],
+  D:[["12/06","EUA","Paraguai",2,1],["14/06","Austrália","Turquia",1,1],
+     ["19/06","Turquia","Paraguai",2,1],["19/06","EUA","Austrália",2,1],
+     ["25/06","Turquia","EUA",1,2],["25/06","Paraguai","Austrália",0,2]],
+  E:[["14/06","Alemanha","Curaçao",3,0],["14/06","C. do Marfim","Equador",1,1],
+     ["20/06","Alemanha","C. do Marfim",2,1],["20/06","Equador","Curaçao",2,1],
+     ["25/06","Equador","Alemanha",1,3],["25/06","Curaçao","C. do Marfim",0,3]],
+  F:[["14/06","Holanda","Japão",2,1],["14/06","Suécia","Tunísia",2,0],
+     ["20/06","Tunísia","Japão",0,2],["20/06","Holanda","Suécia",1,1],
+     ["25/06","Tunísia","Holanda",0,3],["25/06","Japão","Suécia",2,1]],
+  G:[["15/06","Bélgica","Egito",2,1],["15/06","Irã","Nova Zelândia",2,1],
+     ["21/06","Bélgica","Irã",3,0],["21/06","Nova Zelândia","Egito",0,2],
+     ["27/06","Nova Zelândia","Bélgica",0,3],["27/06","Egito","Irã",1,2]],
+  H:[["15/06","Espanha","Cabo Verde",3,0],["15/06","Arábia Saudita","Uruguai",0,2],
+     ["21/06","Espanha","Arábia Saudita",3,0],["21/06","Uruguai","Cabo Verde",2,0],
+     ["26/06","Uruguai","Espanha",1,2],["26/06","Cabo Verde","Arábia Saudita",0,1]],
+  I:[["16/06","França","Senegal",3,0],["16/06","Iraque","Noruega",0,3],
+     ["22/06","França","Iraque",3,0],["22/06","Noruega","Senegal",2,1],
+     ["26/06","Noruega","França",1,2],["26/06","Senegal","Iraque",2,0]],
+  J:[["16/06","Argentina","Argélia",3,0],["17/06","Áustria","Jordânia",2,0],
+     ["22/06","Argentina","Áustria",2,0],["23/06","Jordânia","Argélia",0,2],
+     ["27/06","Jordânia","Argentina",0,3],["27/06","Argélia","Áustria",1,2]],
+  K:[["17/06","Portugal","RD Congo",3,0],["17/06","Uzbequistão","Colômbia",1,2],
+     ["23/06","Portugal","Uzbequistão",2,0],["23/06","Colômbia","RD Congo",2,0],
+     ["27/06","Colômbia","Portugal",1,1],["27/06","RD Congo","Uzbequistão",0,1]],
+  L:[["17/06","Inglaterra","Croácia",2,0],["17/06","Gana","Panamá",2,1],
+     ["23/06","Inglaterra","Gana",3,0],["23/06","Panamá","Croácia",0,2],
+     ["27/06","Panamá","Inglaterra",0,3],["27/06","Croácia","Gana",2,0]]
+};
+
+// 1º / 2º / 3º colocados previstos por grupo
+const COLOCADOS_DEFAULT = {
+  A:["México","Coreia do Sul","Tchéquia"], B:["Suíça","Canadá","Bósnia"],
+  C:["Brasil","Marrocos","Escócia"],       D:["EUA","Austrália","Turquia"],
+  E:["Alemanha","C. do Marfim","Equador"], F:["Holanda","Japão","Suécia"],
+  G:["Bélgica","Irã","Egito"],             H:["Espanha","Uruguai","Arábia Saudita"],
+  I:["França","Noruega","Senegal"],        J:["Argentina","Áustria","Argélia"],
+  K:["Portugal","Colômbia","Uzbequistão"], L:["Inglaterra","Croácia","Gana"]
+};
+
+// Mata-mata previsto. {h,a,ph,pa,w:1=leitura incerta}
+const KO_DEFAULT = {
+  r32:[
+    {h:"Alemanha",a:"Escócia",ph:3,pa:1},
+    {h:"França",a:"Suécia",ph:3,pa:2},
+    {h:"Coreia do Sul",a:"Equador",ph:1,pa:0,w:1},
+    {h:"Holanda",a:"Canadá",ph:3,pa:0},
+    {h:"Marrocos",a:"Colômbia",ph:1,pa:3,w:1},
+    {h:"Espanha",a:"Croácia",ph:3,pa:1,w:1},
+    {h:"Áustria",a:"EUA",ph:1,pa:2},
+    {h:"Bósnia",a:"Bélgica",ph:0,pa:4},
+    {h:"Brasil",a:"Japão",ph:2,pa:1},
+    {h:"Noruega",a:"C. do Marfim",ph:3,pa:2,w:1},
+    {h:"México",a:"Uruguai",ph:3,pa:1,w:1},
+    {h:"Inglaterra",a:"Egito",ph:3,pa:1},
+    {h:"Argentina",a:"Argélia",ph:2,pa:1,w:1},
+    {h:"Irã",a:"Austrália",ph:2,pa:1,w:1},
+    {h:"Suíça",a:"Senegal",ph:3,pa:1,w:1},
+    {h:"Portugal",a:"Turquia",ph:3,pa:1}
+  ],
+  r16:[
+    {h:"Alemanha",a:"França",ph:3,pa:1},
+    {h:"Holanda",a:"Coreia do Sul",ph:2,pa:0},
+    {h:"Espanha",a:"Colômbia",ph:3,pa:0},
+    {h:"Bélgica",a:"EUA",ph:3,pa:0},
+    {h:"Brasil",a:"Noruega",ph:2,pa:0,w:1},
+    {h:"Inglaterra",a:"México",ph:4,pa:2,w:1},
+    {h:"Argentina",a:"Irã",ph:3,pa:1,w:1},
+    {h:"Portugal",a:"Suíça",ph:3,pa:1,w:1}
+  ],
+  qf:[
+    {h:"Alemanha",a:"Holanda",ph:3,pa:4,w:1},
+    {h:"Espanha",a:"Bélgica",ph:3,pa:1,w:1},
+    {h:"Brasil",a:"Inglaterra",ph:2,pa:3,w:1},
+    {h:"Argentina",a:"Portugal",ph:3,pa:1}
+  ],
+  sf:[
+    {h:"Holanda",a:"Espanha",ph:2,pa:3},
+    {h:"Inglaterra",a:"Argentina",ph:2,pa:1,w:1}
+  ],
+  third:{h:"Argentina",a:"Holanda",ph:3,pa:1},
+  final:{h:"Espanha",a:"Inglaterra",ph:3,pa:1},
+  campeao:"Espanha", vice:"Inglaterra", terceiro:"Argentina", artilheiro:"Haaland"
+};
+
+const RODADAS = [["r32","Segunda fase (32 avos)",16],["r16","Oitavas de final",8],["qf","Quartas de final",4],["sf","Semifinais",2]];
+
+/* ============================================================
+   ESTADO + PERSISTÊNCIA
+   ============================================================ */
+const dc = o => JSON.parse(JSON.stringify(o));
+let MEM = null;
+function loadState(){
+  try{ const s = localStorage.getItem("bolao2026_genius"); if(s) return JSON.parse(s); }catch(e){}
+  return MEM;
+}
+function saveState(){
+  MEM = S;
+  try{ localStorage.setItem("bolao2026_genius", JSON.stringify(S)); }catch(e){}
+}
+function freshState(){
+  return {
+    pred:{ jogos:dc(JOGOS_DEFAULT), col:dc(COLOCADOS_DEFAULT), ko:dc(KO_DEFAULT) },
+    res:{
+      grupos: Object.fromEntries(Object.keys(GRUPOS).map(g=>[g, JOGOS_DEFAULT[g].map(()=>[null,null])])),
+      over:   Object.fromEntries(Object.keys(GRUPOS).map(g=>[g, ["","",""]])),
+      ko:{
+        r32:Array.from({length:16},()=>({h:"",a:"",sh:null,sa:null,f:""})),
+        r16:Array.from({length:8},()=>({h:"",a:"",sh:null,sa:null,f:""})),
+        qf: Array.from({length:4},()=>({h:"",a:"",sh:null,sa:null,f:""})),
+        sf: Array.from({length:2},()=>({h:"",a:"",sh:null,sa:null,f:""})),
+        third:{h:"",a:"",sh:null,sa:null,f:""},
+        final:{h:"",a:"",sh:null,sa:null,f:""}
+      },
+      awards:{campeao:"",vice:"",terceiro:"",artilheiro:""}
+    }
+  };
+}
+let S = loadState() || freshState();
+// migração defensiva caso estrutura antiga
+if(!S.pred || !S.res) S = freshState();
+
+/* ============================================================
+   MOTOR DE PONTUAÇÃO
+   ============================================================ */
+const P = CONFIG.pts;
+const norm = s => (s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]/g,"");
+
+// Regra da 1ª fase (e mata-mata com confronto idêntico)
+function ptsJogo(ph,pa,rh,ra){
+  if([ph,pa,rh,ra].some(v=>v===null||v===undefined||v==="")) return {pts:0,regra:"aguardando"};
+  ph=+ph; pa=+pa; rh=+rh; ra=+ra;
+  if(ph===rh && pa===ra) return {pts:P.cheio,regra:"Placar em cheio"};
+  const pd=Math.sign(ph-pa), rd=Math.sign(rh-ra);
+  if(pd===0 && rd===0) return {pts:P.empate,regra:"Acertou o empate"};
+  if(pd===0 || rd===0 || pd!==rd) return {pts:0,regra:"Errou"};
+  const pvw = pd>0?ph:pa, rvw = rd>0?rh:ra;   // escore do vencedor
+  const pvl = pd>0?pa:ph, rvl = rd>0?ra:rh;   // escore do perdedor
+  if(pvw===rvw) return {pts:P.vencEscVenc,regra:"Vencedor + escore do vencedor"};
+  if(pvl===rvl) return {pts:P.vencEscPerd,regra:"Vencedor + escore do perdedor"};
+  return {pts:P.venc,regra:"Apenas o vencedor"};
+}
+
+// Mata-mata: confronto idêntico → regra completa; distinto → só linha de placar
+function ptsKO(p, r){
+  if(!r || r.sh===null || r.sa===null || r.sh==="" || r.sa==="" || !r.h || !r.a) return {pts:0,regra:"aguardando"};
+  const same = (norm(p.h)===norm(r.h)&&norm(p.a)===norm(r.a)) || (norm(p.h)===norm(r.a)&&norm(p.a)===norm(r.h));
+  if(same){
+    const inv = norm(p.h)!==norm(r.h);
+    const res = ptsJogo(p.ph,p.pa, inv?r.sa:r.sh, inv?r.sh:r.sa);
+    return {pts:res.pts, regra:res.regra};
+  }
+  if(!CONFIG.placarSemConfrontoExato) return {pts:0,regra:"Confronto distinto"};
+  const ps=[Math.max(p.ph,p.pa),Math.min(p.ph,p.pa)], rs=[Math.max(+r.sh,+r.sa),Math.min(+r.sh,+r.sa)];
+  if(ps[0]===rs[0]&&ps[1]===rs[1]) return {pts:P.cheio,regra:"Placar em cheio (confronto distinto)"};
+  if(ps[0]===rs[0]) return {pts:P.vencEscVenc,regra:"Escore do vencedor (confronto distinto)"};
+  if(ps[1]===rs[1]) return {pts:P.vencEscPerd,regra:"Escore do perdedor (confronto distinto)"};
+  return {pts:0,regra:"Errou"};
+}
+
+// Classificados na posição correta (oitavas em diante): 20 pts por time presente no confronto correto
+function ptsSlot(p, r){
+  if(!r || (!r.h && !r.a)) return {pts:0, hits:[]};
+  const hits=[];
+  const real=[norm(r.h),norm(r.a)];
+  if(CONFIG.slotOrdemIndiferente){
+    if(r.h||r.a){
+      if(real.includes(norm(p.h)) && p.h) hits.push(p.h);
+      if(real.includes(norm(p.a)) && p.a) hits.push(p.a);
+    }
+  }else{
+    if(p.h && norm(p.h)===norm(r.h)) hits.push(p.h);
+    if(p.a && norm(p.a)===norm(r.a)) hits.push(p.a);
+  }
+  return {pts:hits.length*P.slot, hits};
+}
+
+// Classificação de grupo a partir dos resultados lançados
+function tabelaGrupo(g){
+  const t = {};
+  GRUPOS[g].forEach(tm => t[tm]={team:tm,j:0,pts:0,gp:0,gc:0,sg:0});
+  const jogos = S.pred.jogos[g], res = S.res.grupos[g];
+  let completos = 0;
+  jogos.forEach((j,i)=>{
+    const [rh,ra] = res[i];
+    if(rh===null||ra===null||rh===""||ra==="") return;
+    completos++;
+    const H=t[j[1]], A=t[j[2]];
+    H.j++; A.j++; H.gp+=+rh; H.gc+=+ra; A.gp+=+ra; A.gc+=+rh;
+    if(+rh>+ra) H.pts+=3; else if(+rh<+ra) A.pts+=3; else {H.pts++;A.pts++;}
+  });
+  Object.values(t).forEach(x=>x.sg=x.gp-x.gc);
+  const arr = Object.values(t).sort((a,b)=> b.pts-a.pts || b.sg-a.sg || b.gp-a.gp || a.team.localeCompare(b.team));
+  // detectar empate técnico nos 3 primeiros (exige override manual)
+  let empateTecnico=false;
+  for(let i=0;i<3;i++){
+    const a=arr[i], b=arr[i+1];
+    if(b && a.pts===b.pts && a.sg===b.sg && a.gp===b.gp) empateTecnico=true;
+  }
+  return {arr, completo: completos===jogos.length, empateTecnico};
+}
+
+// Colocação real efetiva (override manual > automática)
+function colocadosReais(g){
+  const ov = S.res.over[g];
+  const tb = tabelaGrupo(g);
+  const auto = tb.completo ? tb.arr.slice(0,3).map(x=>x.team) : [null,null,null];
+  return [0,1,2].map(i => ov[i] ? ov[i] : auto[i]);
+}
+
+function calcular(){
+  const out = {fase1:0, fase2:0, koPlacar:0, koSlot:0, premio:0, total:0,
+               fase1Det:{}, fase2Det:{}, koDet:{}, premioDet:[]};
+  // Fase 1
+  for(const g of Object.keys(GRUPOS)){
+    out.fase1Det[g]=[];
+    S.pred.jogos[g].forEach((j,i)=>{
+      const [rh,ra]=S.res.grupos[g][i];
+      const r = ptsJogo(j[3],j[4],rh,ra);
+      out.fase1 += r.pts;
+      out.fase1Det[g].push(r);
+    });
+  }
+  // Fase 2 — colocados
+  for(const g of Object.keys(GRUPOS)){
+    const real = colocadosReais(g);
+    const pred = S.pred.col[g];
+    const vals=[P.col1,P.col2,P.col3];
+    out.fase2Det[g]=[0,1,2].map(i=>{
+      const hit = real[i] && norm(real[i])===norm(pred[i]);
+      const pts = hit?vals[i]:0;
+      out.fase2 += pts;
+      return {pos:i+1, pred:pred[i], real:real[i], pts};
+    });
+  }
+  // Mata-mata — placares (todas as rodadas, mesmo confrontos errados) + 3º lugar + final
+  const allRounds=[...RODADAS.map(r=>r[0]),"third","final"];
+  for(const rk of allRounds){
+    const preds = rk==="third"||rk==="final" ? [S.pred.ko[rk]] : S.pred.ko[rk];
+    const reals = rk==="third"||rk==="final" ? [S.res.ko[rk]]  : S.res.ko[rk];
+    out.koDet[rk]=preds.map((p,i)=>{
+      const sc = ptsKO(p, reals[i]);
+      out.koPlacar += sc.pts;
+      // Slots: 20 pts a partir das OITAVAS (segunda fase já pontua via colocados; 3º lugar não pontua slot)
+      let slot={pts:0,hits:[]};
+      if(rk!=="r32" && rk!=="third"){ slot = ptsSlot(p, reals[i]); out.koSlot += slot.pts; }
+      return {placar:sc, slot};
+    });
+  }
+  // Premiação
+  const aw=S.res.awards, pk=S.pred.ko;
+  [["campeao","Campeão",P.campeao],["vice","Vice-campeão",P.vice],
+   ["terceiro","Terceiro lugar",P.terceiro],["artilheiro","Artilheiro",P.artilheiro]]
+  .forEach(([k,lbl,v])=>{
+    const hit = aw[k] && norm(aw[k])===norm(pk[k]);
+    const pts = hit?v:0; out.premio+=pts;
+    out.premioDet.push({lbl,pred:pk[k],real:aw[k],pts,max:v});
+  });
+  out.total = out.fase1+out.fase2+out.koPlacar+out.koSlot+out.premio;
+  return out;
+}
+
+/* ============================================================
+   AUTO-FETCH ESPN
+   ============================================================ */
+const ESPN_URL = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard";
+const FIM_GRUPOS = "2026-06-28"; // UTC; eventos antes = fase de grupos
+
+const ALIAS = {
+  mexico:"México",southafrica:"África do Sul",southkorea:"Coreia do Sul",korearepublic:"Coreia do Sul",
+  czechia:"Tchéquia",czechrepublic:"Tchéquia",canada:"Canadá",bosniaandherzegovina:"Bósnia",
+  bosniaherzegovina:"Bósnia",qatar:"Catar",switzerland:"Suíça",brazil:"Brasil",morocco:"Marrocos",
+  haiti:"Haiti",scotland:"Escócia",unitedstates:"EUA",usa:"EUA",unitedstatesofamerica:"EUA",
+  paraguay:"Paraguai",australia:"Austrália",turkey:"Turquia",turkiye:"Turquia",germany:"Alemanha",
+  curacao:"Curaçao",ivorycoast:"C. do Marfim",cotedivoire:"C. do Marfim",ecuador:"Equador",
+  netherlands:"Holanda",japan:"Japão",sweden:"Suécia",tunisia:"Tunísia",belgium:"Bélgica",
+  egypt:"Egito",iran:"Irã",irniran:"Irã",newzealand:"Nova Zelândia",spain:"Espanha",
+  capeverde:"Cabo Verde",caboverde:"Cabo Verde",capeverdeislands:"Cabo Verde",
+  saudiarabia:"Arábia Saudita",uruguay:"Uruguai",france:"França",senegal:"Senegal",iraq:"Iraque",
+  norway:"Noruega",argentina:"Argentina",algeria:"Argélia",austria:"Áustria",jordan:"Jordânia",
+  portugal:"Portugal",drcongo:"RD Congo",congodr:"RD Congo",democraticrepublicofthecongo:"RD Congo",
+  drcongokinshasa:"RD Congo",uzbekistan:"Uzbequistão",colombia:"Colômbia",england:"Inglaterra",
+  ghana:"Gana",croatia:"Croácia",panama:"Panamá"
+};
+Object.values(GRUPOS).flat().forEach(t=>ALIAS[norm(t)]=t);
+const ptName = en => ALIAS[norm(en)] || null;
+const samePair = (p,r) => (norm(p.h)&&norm(p.a)) &&
+  ((norm(p.h)===norm(r.h)&&norm(p.a)===norm(r.a))||(norm(p.h)===norm(r.a)&&norm(p.a)===norm(r.h)));
+
+function flog(msg){
+  const el = document.getElementById("fetchlog");
+  if(!el) return;
+  el.style.display="block";
+  el.textContent += msg + "\n";
+  el.scrollTop = el.scrollHeight;
+}
+
+async function fetchESPN(){
+  const btn = document.getElementById("btnFetch");
+  btn.disabled=true; const lbl=btn.textContent; btn.textContent="⟳ Buscando…";
+  document.querySelectorAll("#nav button").forEach(x=>x.classList.toggle("on", x.dataset.tab==="res"));
+  ["res","ko","score","pred","rules"].forEach(k=>$("tab-"+k).style.display = k==="res"?"":"none");
+  renderResultados();
+  const log = document.getElementById("fetchlog"); if(log) log.textContent="";
+
+  let events=[];
+  const ranges=[["20260611","20260627"],["20260628","20260705"],["20260706","20260712"],["20260713","20260719"]];
+  try{
+    const r=await fetch(`${ESPN_URL}?limit=400&dates=20260611-20260719`);
+    if(!r.ok) throw new Error("HTTP "+r.status);
+    const d=await r.json(); events=d.events||[];
+  }catch(e){
+    flog("Range completo falhou ("+e.message+"); tentando por janelas…");
+    for(const [a,b] of ranges){
+      try{ const r=await fetch(`${ESPN_URL}?limit=200&dates=${a}-${b}`); const d=await r.json(); events.push(...(d.events||[])); }
+      catch(e2){ flog("Janela "+a+"-"+b+" falhou: "+e2.message); }
+    }
+  }
+  const seen=new Set();
+  events=events.filter(e=>{ if(seen.has(e.id))return false; seen.add(e.id); return true; });
+  flog(events.length+" eventos recebidos da ESPN.");
+  let nG=0,nK=0,skip=0;
+  const cutoff = new Date(FIM_GRUPOS+"T00:00:00Z").getTime();
+  const koEvents=[];
+  for(const ev of events){
+    try{
+      const comp=ev.competitions&&ev.competitions[0]; if(!comp) continue;
+      const st=comp.status&&comp.status.type;
+      if(!st||!st.completed) continue;
+      const cs=comp.competitors||[];
+      const home=cs.find(c=>c.homeAway==="home")||cs[0];
+      const away=cs.find(c=>c.homeAway==="away")||cs[1];
+      if(!home||!away) continue;
+      const hN=ptName(home.team&&(home.team.displayName||home.team.name));
+      const aN=ptName(away.team&&(away.team.displayName||away.team.name));
+      if(!hN||!aN){ skip++; flog("Time não mapeado: "+(home.team&&home.team.displayName)+" × "+(away.team&&away.team.displayName)); continue; }
+      const hs=parseInt(home.score,10), as=parseInt(away.score,10);
+      if(isNaN(hs)||isNaN(as)) continue;
+      const pens = (home.shootoutScore!=null)||(away.shootoutScore!=null)||/pen/i.test(st.detail||"")||/pen/i.test(st.shortDetail||"");
+      const when=new Date(ev.date).getTime();
+      if(when<cutoff){
+        let done=false;
+        for(const g of Object.keys(GRUPOS)){
+          const jogos = S.pred.jogos[g];
+          const idx = jogos.findIndex(j=>samePair({h:j[1],a:j[2]},{h:hN,a:aN}));
+          if(idx>=0){
+            const inv = norm(jogos[idx][1])!==norm(hN);
+            S.res.grupos[g][idx]=[inv?as:hs, inv?hs:as];
+            nG++; done=true; break;
+          }
+        }
+        if(!done){ skip++; flog("Sem fixture p/ "+hN+" × "+aN); }
+      }else{
+        koEvents.push({when,h:hN,a:aN,sh:hs,sa:as,pens});
+      }
+    }catch(e){ skip++; }
+  }
+  koEvents.sort((a,b)=>a.when-b.when);
+  const layout=[["r32",16],["r16",8],["qf",4],["sf",2],["third",1],["final",1]];
+  let idx=0;
+  for(const [rk,n] of layout){
+    for(let i=0;i<n&&idx<koEvents.length;i++,idx++){
+      const e=koEvents[idx];
+      const slot=(rk==="third"||rk==="final")?S.res.ko[rk]:S.res.ko[rk][i];
+      slot.h=e.h; slot.a=e.a; slot.sh=e.sh; slot.sa=e.sa;
+      slot.f = e.pens ? "⚠ Pênaltis — confira o placar de 90 min (regulamento ignora prorrogação/pênaltis)" : "";
+      if(e.pens) flog("⚠ "+e.h+" × "+e.a+" decidido nos pênaltis — confira o placar de 90 min.");
+      nK++;
+    }
+  }
+  flog(`Concluído: ${nG} jogos de grupo + ${nK} de mata-mata aplicados; ${skip} ignorados.`);
+  if(nG===0 && nK===0 && events.length>0) flog("Nenhum jogo encerrado encontrado ainda. Tente novamente após o término de uma partida.");
+  if(events.length===0) flog("Não foi possível conectar à ESPN. Verifique sua internet e tente novamente em alguns minutos.");
+  btn.disabled=false; btn.textContent=lbl;
+  saveState(); refresh();
+}
+
+/* ============================================================
+   RENDERIZAÇÃO
+   ============================================================ */
+const $ = id => document.getElementById(id);
+const esc = s => String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const cls = p => p>=10?"p10":p>=7?"p8":p>=5?"p5":"p0";
+
+function renderResultados(){
+  let h = `<div class="note">Lance aqui o <b>placar real até os 90 min + acréscimos</b> de cada jogo, ou use <b>⟳ Atualizar resultados (ESPN)</b> no topo para buscar automaticamente. A classificação do grupo é calculada automaticamente. Jogos com <span class="warn">⚠</span> foram aos pênaltis — confira o placar de 90 min.</div><div id="fetchlog"></div><div class="grid">`;
+  for(const g of Object.keys(GRUPOS)){
+    const tb = tabelaGrupo(g);
+    h += `<div class="card"><h3>Grupo ${g}<span class="sub">${GRUPOS[g].join(" · ")}</span></h3><div class="body"><table>`;
+    S.pred.jogos[g].forEach((j,i)=>{
+      const [rh,ra]=S.res.grupos[g][i];
+      h += `<tr>
+        <td class="pred">${j[0]}</td>
+        <td class="team r">${esc(j[1])}</td>
+        <td class="c" style="white-space:nowrap">
+          <input type="number" min="0" max="20" value="${rh??""}" data-res="${g}|${i}|0">
+          <span style="color:var(--dim)">×</span>
+          <input type="number" min="0" max="20" value="${ra??""}" data-res="${g}|${i}|1">
+        </td>
+        <td class="team">${esc(j[2])}</td>
+        <td class="pred c">(${j[3]}×${j[4]})</td>
+      </tr>`;
+    });
+    h += `</table>`;
+    // tabela do grupo
+    h += `<table style="margin-top:8px"><tr><th></th><th>Time</th><th class="c">J</th><th class="c">P</th><th class="c">SG</th><th class="c">GP</th><th>Colocado real</th></tr>`;
+    tb.arr.forEach((t,i)=>{
+      let sel="";
+      if(i<3){
+        const ov=S.res.over[g][i];
+        sel = `<select data-over="${g}|${i}"><option value="">auto${tb.completo?": "+esc(tb.arr[i].team):""}</option>${GRUPOS[g].map(tm=>`<option ${ov===tm?"selected":""}>${esc(tm)}</option>`).join("")}</select>`;
+      }
+      h += `<tr class="standing"><td class="pos">${i+1}º</td><td>${esc(t.team)}</td><td class="c">${t.j}</td><td class="c"><b>${t.pts}</b></td><td class="c">${t.sg>0?"+":""}${t.sg}</td><td class="c">${t.gp}</td><td>${sel}</td></tr>`;
+    });
+    h += `</table>`;
+    if(tb.empateTecnico) h += `<div class="note y" style="margin:8px 0 0">⚠ Empate técnico (P/SG/GP iguais) — defina o colocado manualmente conforme critério oficial.</div>`;
+    h += `</div></div>`;
+  }
+  h += `</div>`;
+  $("tab-res").innerHTML = h;
+}
+
+function koRowRes(rk, i, p, r){
+  const flag = p.w ? ` <span class="flag warn" title="Leitura incerta do manuscrito — confira na aba Meus palpites">⚠</span>` : "";
+  const fpens = r.f ? ` <span class="flag warn" title="${esc(r.f)}">⚠</span>` : "";
+  return `<div class="ko-match">
+    <span class="slot">J${i+1}</span>
+    <input type="text" list="teams" placeholder="Time 1" value="${esc(r.h)}" data-ko="${rk}|${i}|h">
+    <input type="number" min="0" max="20" value="${r.sh??""}" data-ko="${rk}|${i}|sh">
+    <span style="color:var(--dim)">×</span>
+    <input type="number" min="0" max="20" value="${r.sa??""}" data-ko="${rk}|${i}|sa">
+    <input type="text" list="teams" placeholder="Time 2" value="${esc(r.a)}" data-ko="${rk}|${i}|a">${fpens}
+    <div class="ko-pred">palpite: <b>${esc(p.h)} ${p.ph}×${p.pa} ${esc(p.a)}</b>${flag}</div>
+  </div>`;
+}
+
+function renderKO(){
+  let h = `<div class="note">Lance os <b>confrontos reais</b> e o placar de 90 min + acréscimos. Em caso de empate no tempo normal, registre o empate — quem avança você indica preenchendo a rodada seguinte. Premiação (campeão, vice, 3º, artilheiro) ao final da página.</div>`;
+  for(const [rk,nome] of RODADAS.map(r=>[r[0],r[1]])){
+    h += `<div class="section-title">${nome}</div><div class="card"><div class="body">`;
+    S.pred.ko[rk].forEach((p,i)=> h += koRowRes(rk,i,p,S.res.ko[rk][i]));
+    h += `</div></div>`;
+  }
+  h += `<div class="section-title">Disputa de 3º lugar</div><div class="card"><div class="body">${koRowRes("third",0,S.pred.ko.third,S.res.ko.third)}</div></div>`;
+  h += `<div class="section-title">Final</div><div class="card"><div class="body">${koRowRes("final",0,S.pred.ko.final,S.res.ko.final)}</div></div>`;
+  const aw=S.res.awards, pk=S.pred.ko;
+  h += `<div class="section-title">Premiação</div><div class="card"><div class="body"><table>
+    ${[["campeao","Campeão real",pk.campeao],["vice","Vice-campeão real",pk.vice],["terceiro","Terceiro lugar real",pk.terceiro],["artilheiro","Artilheiro real",pk.artilheiro]]
+      .map(([k,lbl,pr])=>`<tr><th style="width:160px">${lbl}</th><td><input type="text" ${k!=="artilheiro"?'list="teams"':""} value="${esc(aw[k])}" data-aw="${k}"></td><td class="pred" style="width:200px">palpite: ${esc(pr)}</td></tr>`).join("")}
+  </table></div></div>`;
+  $("tab-ko").innerHTML = h;
+}
+
+function renderScore(){
+  const R = calcular();
+  $("totalChip").textContent = R.total;
+  let h = `<div class="totbar">
+    <div class="tot"><div class="lbl">1ª fase · placares</div><div class="val">${R.fase1}</div></div>
+    <div class="tot"><div class="lbl">2ª fase · colocados</div><div class="val">${R.fase2}</div></div>
+    <div class="tot"><div class="lbl">Mata-mata · placares</div><div class="val">${R.koPlacar}</div></div>
+    <div class="tot"><div class="lbl">Classificados (20 pts)</div><div class="val">${R.koSlot}</div></div>
+    <div class="tot"><div class="lbl">Premiação</div><div class="val">${R.premio}</div></div>
+    <div class="tot grand"><div class="lbl">Total geral</div><div class="val">${R.total}</div></div>
+  </div>`;
+
+  // Fase 1 detalhe
+  h += `<div class="section-title">1ª fase — jogo a jogo <small>10 cheio · 8 venc.+escore venc. / empate · 7 venc.+escore perd. · 5 vencedor</small></div><div class="grid">`;
+  for(const g of Object.keys(GRUPOS)){
+    const sub = R.fase1Det[g].reduce((s,x)=>s+x.pts,0);
+    h += `<div class="card"><h3>Grupo ${g}<span class="sub">${sub} pts</span></h3><div class="body"><table>`;
+    S.pred.jogos[g].forEach((j,i)=>{
+      const [rh,ra]=S.res.grupos[g][i];
+      const d = R.fase1Det[g][i];
+      const real = (rh===null||ra===null||rh===""||ra==="")?"—":`${rh}×${ra}`;
+      h += `<tr><td class="team">${esc(j[1])} × ${esc(j[2])}</td><td class="pred c">${j[3]}×${j[4]}</td><td class="c" style="font-family:var(--mono)">${real}</td><td class="pred">${d.regra}</td><td class="pts ${cls(d.pts)}">${d.pts}</td></tr>`;
+    });
+    h += `</table></div></div>`;
+  }
+  h += `</div>`;
+
+  // Fase 2 detalhe
+  h += `<div class="section-title">2ª fase — colocados por grupo <small>1º = 20 · 2º = 15 · 3º = 10</small></div><div class="grid">`;
+  for(const g of Object.keys(GRUPOS)){
+    const det = R.fase2Det[g];
+    const sub = det.reduce((s,x)=>s+x.pts,0);
+    h += `<div class="card"><h3>Grupo ${g}<span class="sub">${sub} pts</span></h3><div class="body"><table>`;
+    det.forEach(d=>{
+      h += `<tr><td class="pos pred">${d.pos}º</td><td class="team">${esc(d.pred)}</td><td class="pred">real: ${d.real?esc(d.real):"—"}</td><td class="pts ${d.pts?"hit":"p0"}">${d.pts}</td></tr>`;
+    });
+    h += `</table></div></div>`;
+  }
+  h += `</div>`;
+
+  // Mata-mata detalhe
+  const nomes = {r32:"Segunda fase",r16:"Oitavas",qf:"Quartas",sf:"Semifinais",third:"3º lugar",final:"Final"};
+  h += `<div class="section-title">Mata-mata <small>placar pontua mesmo com classificados errados · time no confronto correto (oitavas em diante) = 20 pts</small></div>`;
+  for(const rk of ["r32","r16","qf","sf","third","final"]){
+    const preds = rk==="third"||rk==="final"?[S.pred.ko[rk]]:S.pred.ko[rk];
+    const reals = rk==="third"||rk==="final"?[S.res.ko[rk]]:S.res.ko[rk];
+    const det = R.koDet[rk];
+    const sub = det.reduce((s,x)=>s+x.placar.pts+x.slot.pts,0);
+    h += `<div class="card" style="margin-bottom:12px"><h3>${nomes[rk]}<span class="sub">${sub} pts</span></h3><div class="body"><table>
+      <tr><th>Palpite</th><th>Real</th><th>Regra placar</th><th class="c">Placar</th><th>Classif.</th><th class="c">Slot</th></tr>`;
+    preds.forEach((p,i)=>{
+      const r=reals[i], d=det[i];
+      const real = r.h||r.a ? `${esc(r.h)} ${r.sh??"–"}×${r.sa??"–"} ${esc(r.a)}` : "—";
+      h += `<tr>
+        <td class="pred">${esc(p.h)} ${p.ph}×${p.pa} ${esc(p.a)}</td>
+        <td style="font-family:var(--mono);font-size:12px">${real}</td>
+        <td class="pred">${d.placar.regra}</td>
+        <td class="pts ${cls(d.placar.pts)}">${d.placar.pts}</td>
+        <td class="pred">${d.slot.hits.map(esc).join(", ")||"—"}</td>
+        <td class="pts ${d.slot.pts?"hit":"p0"}">${d.slot.pts}</td>
+      </tr>`;
+    });
+    h += `</table></div></div>`;
+  }
+
+  // Premiação
+  h += `<div class="section-title">Premiação</div><div class="card"><div class="body"><table>
+    <tr><th>Item</th><th>Palpite</th><th>Real</th><th class="c">Pts</th><th class="c">Máx</th></tr>`;
+  R.premioDet.forEach(d=>{
+    h += `<tr><td>${d.lbl}</td><td class="team">${esc(d.pred)}</td><td>${d.real?esc(d.real):"—"}</td><td class="pts ${d.pts?"hit":"p0"}">${d.pts}</td><td class="c pred">${d.max}</td></tr>`;
+  });
+  h += `</table></div></div>`;
+  $("tab-score").innerHTML = h;
+}
+
+function renderPred(){
+  let h = `<div class="note y">Palpites transcritos da sua ficha escaneada. Itens com <b>⚠</b> tiveram leitura incerta do manuscrito — <b>confira contra a ficha física e corrija aqui</b>. Tudo é editável e fica salvo.</div>`;
+  // jogos de grupo
+  h += `<div class="section-title">Palpites — fase de grupos</div><div class="grid">`;
+  for(const g of Object.keys(GRUPOS)){
+    h += `<div class="card"><h3>Grupo ${g}</h3><div class="body"><table>`;
+    S.pred.jogos[g].forEach((j,i)=>{
+      h += `<tr><td class="team r">${esc(j[1])}</td>
+        <td class="c" style="white-space:nowrap">
+          <input type="number" min="0" max="20" value="${j[3]}" data-pj="${g}|${i}|3">
+          <span style="color:var(--dim)">×</span>
+          <input type="number" min="0" max="20" value="${j[4]}" data-pj="${g}|${i}|4">
+        </td><td class="team">${esc(j[2])}</td></tr>`;
+    });
+    h += `</table></div></div>`;
+  }
+  h += `</div>`;
+  // colocados
+  h += `<div class="section-title">Palpites — colocados por grupo</div><div class="grid">`;
+  for(const g of Object.keys(GRUPOS)){
+    h += `<div class="card"><h3>Grupo ${g}</h3><div class="body"><table>`;
+    [0,1,2].forEach(i=>{
+      h += `<tr><td class="pos pred">${i+1}º</td><td><select data-pc="${g}|${i}">${GRUPOS[g].map(t=>`<option ${S.pred.col[g][i]===t?"selected":""}>${esc(t)}</option>`).join("")}</select></td></tr>`;
+    });
+    h += `</table></div></div>`;
+  }
+  h += `</div>`;
+  // mata-mata
+  const nomes = {r32:"Segunda fase",r16:"Oitavas",qf:"Quartas",sf:"Semifinais"};
+  h += `<div class="section-title">Palpites — mata-mata</div>`;
+  for(const rk of ["r32","r16","qf","sf"]){
+    h += `<div class="card" style="margin-bottom:12px"><h3>${nomes[rk]}</h3><div class="body">`;
+    S.pred.ko[rk].forEach((p,i)=>{
+      h += `<div class="ko-match"><span class="slot">J${i+1}${p.w?' <span class="warn flag" title="Leitura incerta">⚠</span>':""}</span>
+        <input type="text" list="teams" value="${esc(p.h)}" data-pk="${rk}|${i}|h">
+        <input type="number" min="0" max="20" value="${p.ph}" data-pk="${rk}|${i}|ph">
+        <span style="color:var(--dim)">×</span>
+        <input type="number" min="0" max="20" value="${p.pa}" data-pk="${rk}|${i}|pa">
+        <input type="text" list="teams" value="${esc(p.a)}" data-pk="${rk}|${i}|a">
+      </div>`;
+    });
+    h += `</div></div>`;
+  }
+  for(const [rk,lbl] of [["third","Disputa de 3º lugar"],["final","Final"]]){
+    const p=S.pred.ko[rk];
+    h += `<div class="card" style="margin-bottom:12px"><h3>${lbl}</h3><div class="body"><div class="ko-match"><span class="slot">—</span>
+      <input type="text" list="teams" value="${esc(p.h)}" data-pk="${rk}|0|h">
+      <input type="number" min="0" max="20" value="${p.ph}" data-pk="${rk}|0|ph">
+      <span style="color:var(--dim)">×</span>
+      <input type="number" min="0" max="20" value="${p.pa}" data-pk="${rk}|0|pa">
+      <input type="text" list="teams" value="${esc(p.a)}" data-pk="${rk}|0|a">
+    </div></div></div>`;
+  }
+  h += `<div class="card"><h3>Premiação (palpites)</h3><div class="body"><table>
+    ${[["campeao","Campeão"],["vice","Vice-campeão"],["terceiro","Terceiro lugar"],["artilheiro","Artilheiro"]]
+      .map(([k,lbl])=>`<tr><th style="width:160px">${lbl}</th><td><input type="text" ${k!=="artilheiro"?'list="teams"':""} value="${esc(S.pred.ko[k])}" data-pa="${k}"></td></tr>`).join("")}
+  </table></div></div>`;
+  $("tab-pred").innerHTML = h;
+}
+
+function renderRules(){
+  $("tab-rules").innerHTML = `
+  <div class="card"><h3>Regulamento implementado</h3><div class="body">
+  <table>
+    <tr><th colspan="2">1ª fase (e placares do mata-mata)</th></tr>
+    <tr><td>Placar em cheio</td><td class="pts p10">10</td></tr>
+    <tr><td>Vencedor + escore do vencedor</td><td class="pts p8">8</td></tr>
+    <tr><td>Vencedor + escore do perdedor</td><td class="pts p8">7</td></tr>
+    <tr><td>Apenas o vencedor</td><td class="pts p5">5</td></tr>
+    <tr><td>Apenas o empate</td><td class="pts p8">8</td></tr>
+    <tr><th colspan="2">2ª fase</th></tr>
+    <tr><td>1º colocado do grupo</td><td class="pts p10">20</td></tr>
+    <tr><td>2º colocado do grupo</td><td class="pts p10">15</td></tr>
+    <tr><td>3º colocado do grupo</td><td class="pts p10">10</td></tr>
+    <tr><th colspan="2">Oitavas em diante</th></tr>
+    <tr><td>Classificado na posição correta (por time)</td><td class="pts p10">20</td></tr>
+    <tr><td>Campeão</td><td class="pts p10">50</td></tr>
+    <tr><td>Vice-campeão</td><td class="pts p10">30</td></tr>
+    <tr><td>Terceiro lugar</td><td class="pts p10">20</td></tr>
+    <tr><td>Artilheiro</td><td class="pts p10">30</td></tr>
+  </table>
+  <div class="note" style="margin-top:12px"><b>Regras gerais:</b> placar considerado até 90 min + acréscimos (sem prorrogação/pênaltis). Mesmo errando os classificados, o placar do jogo continua valendo com pontuação semelhante à 1ª fase.</div>
+  <div class="note y"><b>Interpretações adotadas (confirmar com o conferente):</b><br>
+  1) "Classificado na posição correta" = time presente no confronto correto da chave, independentemente do lado (configurável em <span style="font-family:var(--mono)">CONFIG.slotOrdemIndiferente</span>).<br>
+  2) Quando o confronto real é diferente do previsto, o placar é comparado por linha de placar (maior×menor): em cheio = 10, escore do vencedor = 8, do perdedor = 7 (configurável em <span style="font-family:var(--mono)">CONFIG.placarSemConfrontoExato</span>).<br>
+  3) O 3º lugar de cada grupo pontua 10 mesmo que a seleção não esteja entre as 8 melhores que avançam.<br>
+  4) Participantes da disputa de 3º lugar não geram pontos de "slot" (são os perdedores das semis); o acerto do 3º colocado pontua 20 na premiação.</div>
+  </div></div>`;
+}
+
+/* ============================================================
+   EVENTOS
+   ============================================================ */
+function refresh(keep){
+  saveState();
+  if(keep!=="res") renderResultados();
+  if(keep!=="ko") renderKO();
+  renderScore();
+  if(keep!=="pred") renderPred();
+}
+document.addEventListener("input", e=>{
+  const t=e.target;
+  const num = v => v===""?null:Math.max(0,parseInt(v,10)||0);
+  if(t.dataset.res){ const [g,i,s]=t.dataset.res.split("|"); S.res.grupos[g][+i][+s]=num(t.value); refresh("res"); }
+  else if(t.dataset.over){ const [g,i]=t.dataset.over.split("|"); S.res.over[g][+i]=t.value; refresh("res"); }
+  else if(t.dataset.ko){
+    const [rk,i,f]=t.dataset.ko.split("|");
+    const obj = rk==="third"||rk==="final"?S.res.ko[rk]:S.res.ko[rk][+i];
+    obj[f] = (f==="sh"||f==="sa")?num(t.value):t.value;
+    obj.f = ""; // edição manual remove flag de pênaltis
+    refresh("ko");
+  }
+  else if(t.dataset.aw){ S.res.awards[t.dataset.aw]=t.value; refresh("ko"); }
+  else if(t.dataset.pj){ const [g,i,f]=t.dataset.pj.split("|"); S.pred.jogos[g][+i][+f]=num(t.value)??0; refresh("pred"); }
+  else if(t.dataset.pc){ const [g,i]=t.dataset.pc.split("|"); S.pred.col[g][+i]=t.value; refresh("pred"); }
+  else if(t.dataset.pk){
+    const [rk,i,f]=t.dataset.pk.split("|");
+    const obj = rk==="third"||rk==="final"?S.pred.ko[rk]:S.pred.ko[rk][+i];
+    obj[f] = (f==="ph"||f==="pa")?(num(t.value)??0):t.value;
+    if(obj.w) delete obj.w; // editou = revisado
+    refresh("pred");
+  }
+  else if(t.dataset.pa){ S.pred.ko[t.dataset.pa]=t.value; refresh("pred"); }
+});
+
+document.getElementById("nav").addEventListener("click", e=>{
+  const b=e.target.closest("button"); if(!b) return;
+  document.querySelectorAll("#nav button").forEach(x=>x.classList.toggle("on",x===b));
+  ["res","ko","score","pred","rules"].forEach(k=>$("tab-"+k).style.display = k===b.dataset.tab?"":"none");
+});
+
+function exportJSON(){
+  const blob = new Blob([JSON.stringify(S,null,1)],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="bolao2026_backup_"+new Date().toISOString().slice(0,10)+".json";
+  a.click(); URL.revokeObjectURL(a.href);
+}
+function importJSON(inp){
+  const f=inp.files[0]; if(!f) return;
+  const rd=new FileReader();
+  rd.onload=()=>{ try{ const d=JSON.parse(rd.result); if(d.pred&&d.res){ S=d; refresh(); } else alert("Arquivo inválido."); }catch(e){ alert("JSON inválido."); } };
+  rd.readAsText(f); inp.value="";
+}
+function resetAll(){
+  if(!confirm("Zerar todos os RESULTADOS lançados? (palpites são mantidos)")) return;
+  const fresh = freshState();
+  S.res = fresh.res;
+  refresh();
+}
+
+/* init */
+(function(){
+  const all=[...new Set(Object.values(GRUPOS).flat())].sort();
+  $("teams").innerHTML = all.map(t=>`<option value="${esc(t)}">`).join("");
+  renderResultados(); renderKO(); renderScore(); renderPred(); renderRules();
+})();
+</script>
+</body>
+</html>
